@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Medical Recommendation System</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    body {
+      background: linear-gradient(to bottom right, #020617, #0f172a, #020617);
+      min-height: 100vh;
+    }
+  </style>
+</head>
+<body class="text-white p-6">
+
+  <div class="max-w-6xl mx-auto">
+
+    <!-- HEADER -->
+
+    <div class="text-center mb-10">
+
+      <h1 class="text-5xl font-black mb-5">
+        AI Medical Recommendation System
+      </h1>
+
+      <p class="text-slate-300 text-lg leading-8 max-w-3xl mx-auto">
+        نظام ذكي للبحث عن الأدوية باستخدام Machine Learning
+        <br>
+        يدعم البحث بالعربي والإنجليزي وتصحيح الأخطاء الإملائية
+      </p>
+    </div>
+
+    <!-- FEATURES -->
+
+    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-5 mb-10">
+
+      <div class="bg-slate-800 border border-slate-700 rounded-2xl p-5">
+        <h3 class="text-xl font-bold mb-3">Arabic Search</h3>
+
+        <p class="text-slate-400 leading-7">
+          يدعم البحث بالعربي مثل:
+          <br>
+          بانادول - بروفين
+        </p>
+      </div>
+
+      <div class="bg-slate-800 border border-slate-700 rounded-2xl p-5">
+        <h3 class="text-xl font-bold mb-3">Typo Correction</h3>
+
+        <p class="text-slate-400 leading-7">
+          يصلح الأخطاء الإملائية تلقائيًا
+          <br>
+          مثل: ibuprfen
+        </p>
+      </div>
+
+      <div class="bg-slate-800 border border-slate-700 rounded-2xl p-5">
+        <h3 class="text-xl font-bold mb-3">Machine Learning</h3>
+
+        <p class="text-slate-400 leading-7">
+          يستخدم TF-IDF و Cosine Similarity
+          لتحليل التشابه الطبي
+        </p>
+      </div>
+
+      <div class="bg-slate-800 border border-slate-700 rounded-2xl p-5">
+        <h3 class="text-xl font-bold mb-3">Smart Recommendations</h3>
+
+        <p class="text-slate-400 leading-7">
+          يقترح أدوية مشابهة بناءً على
+          المادة الفعالة والاستخدام
+        </p>
+      </div>
+    </div>
+
+    <!-- SEARCH SECTION -->
+
+    <div class="bg-slate-900 border border-slate-700 rounded-3xl p-6 mb-8">
+
+      <h2 class="text-3xl font-black text-center mb-4">
+        Smart Drug Search
+      </h2>
+
+      <p class="text-center text-slate-400 mb-6 leading-8">
+        اكتب اسم الدواء بالعربي أو الإنجليزي
+        <br>
+        مثال:
+        Panadol - Ibuprofen - بانادول - بروفين
+      </p>
+
+      <div class="flex flex-col md:flex-row gap-4">
+
+        <input
+          id="drugInput"
+          type="text"
+          placeholder="Search drug name..."
+          class="flex-1 bg-slate-800 border border-slate-600 rounded-2xl px-5 py-4 text-lg outline-none focus:border-cyan-400"
+        />
+
+        <button
+          onclick="searchDrug()"
+          class="bg-cyan-400 hover:bg-cyan-300 transition-all text-black font-bold px-8 py-4 rounded-2xl text-lg"
+        >
+          Search
+        </button>
+      </div>
+    </div>
+
+    <!-- LOADING -->
+
+    <div
+      id="loading"
+      class="hidden text-center text-cyan-400 text-2xl font-bold py-6"
+    >
+      Searching AI Medical Database...
+    </div>
+
+    <!-- ERROR -->
+
+    <div
+      id="error"
+      class="hidden bg-red-500/20 border border-red-500 text-red-300 rounded-2xl p-5 mb-6 text-center"
+    ></div>
+
+    <!-- RESULTS -->
+
+    <div id="results" class="grid lg:grid-cols-2 gap-6"></div>
+
+    <!-- EMPTY STATE -->
+
+    <div
+      id="emptyState"
+      class="bg-slate-900 border border-slate-700 rounded-3xl p-8 text-center text-slate-400 leading-8 mt-6"
+    >
+      <h3 class="text-3xl font-black text-white mb-4">
+        What Does This System Do?
+      </h3>
+
+      <p>
+        This AI-powered system analyzes medical drug similarity using Machine Learning.
+      </p>
+
+      <p class="mt-3">
+        النظام يقوم بتحليل الأدوية واقتراح بدائل مشابهة طبيًا
+        باستخدام الذكاء الاصطناعي.
+      </p>
+
+      <div class="mt-6 text-cyan-400 font-bold">
+        Try Searching:
+        <br>
+        Panadol / Ibuprofen / بانادول / بروفين
+      </div>
+    </div>
+  </div>
+
+  <script>
+
+    // =====================================================
+    // API URL
+    // =====================================================
+
+    const API_BASE = "http://38.211.244.61:8000";
+
+    // =====================================================
+    // ENTER SUPPORT
+    // =====================================================
+
+    document
+      .getElementById("drugInput")
+      .addEventListener("keydown", function(event) {
+
+        if (event.key === "Enter") {
+          searchDrug();
+        }
+      });
+
+    // =====================================================
+    // SEARCH FUNCTION
+    // =====================================================
+
+    async function searchDrug() {
+
+      const query = document
+        .getElementById("drugInput")
+        .value
+        .trim();
+
+      if (!query) return;
+
+      const loading = document.getElementById("loading");
+      const resultsDiv = document.getElementById("results");
+      const errorDiv = document.getElementById("error");
+      const emptyState = document.getElementById("emptyState");
+
+      loading.classList.remove("hidden");
+      errorDiv.classList.add("hidden");
+      resultsDiv.innerHTML = "";
+      emptyState.style.display = "none";
+
+      try {
+
+        const response = await fetch(
+          `${API_BASE}/recommend/${encodeURIComponent(query)}`
+        );
+
+        const data = await response.json();
+
+        loading.classList.add("hidden");
+
+        if (!data.recommendations || data.recommendations.length === 0) {
+
+          resultsDiv.innerHTML = `
+            <div class="col-span-full bg-slate-900 border border-slate-700 rounded-3xl p-8 text-center text-red-300 text-xl">
+              No recommendations found
+            </div>
+          `;
+
+          return;
+        }
+
+        data.recommendations.forEach(drug => {
+
+          const card = `
+            <div class="bg-slate-900 border border-slate-700 rounded-3xl p-6 hover:border-cyan-400 transition-all">
+
+              <div class="flex items-center justify-between mb-5">
+
+                <h2 class="text-2xl font-black text-cyan-400 capitalize">
+                  ${drug.drug_name}
+                </h2>
+
+                <div class="bg-cyan-500/20 text-cyan-300 px-4 py-2 rounded-xl font-bold">
+                  ${drug.similarity_score}
+                </div>
+              </div>
+
+              <div class="space-y-4 text-slate-300">
+
+                <div>
+                  <span class="font-bold text-white">
+                    Active Substance:
+                  </span>
+                  <br>
+                  <span class="capitalize">
+                    ${drug.active_substance || "Unknown"}
+                  </span>
+                </div>
+
+                <div>
+                  <span class="font-bold text-white">
+                    Dosage Form:
+                  </span>
+                  <br>
+                  <span class="capitalize">
+                    ${drug.dosage_form || "Unknown"}
+                  </span>
+                </div>
+
+                <div>
+                  <span class="font-bold text-white">
+                    Medical Use:
+                  </span>
+                  <br>
+                  <span class="capitalize">
+                    ${drug.indication || "Unknown"}
+                  </span>
+                </div>
+              </div>
+            </div>
+          `;
+
+          resultsDiv.innerHTML += card;
+        });
+
+      } catch (error) {
+
+        loading.classList.add("hidden");
+
+        errorDiv.classList.remove("hidden");
+
+        errorDiv.innerHTML = "Failed to connect to AI Medical API";
+
+        console.error(error);
+      }
+    }
+  </script>
+</body>
+</html>
