@@ -1,290 +1,1146 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AI Medical Recommendation System</title>
-
-  <script src="https://cdn.tailwindcss.com"></script>
+  <title>MediSearch AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
 
   <style>
+    :root {
+      --bg:        #f5f0e8;
+      --surface:   #ede8de;
+      --card:      #fff9f0;
+      --ink:       #1a1208;
+      --ink2:      #4a3f2f;
+      --muted:     #9a8f7e;
+      --line:      rgba(26,18,8,0.10);
+
+      --red:       #d63a2a;
+      --red-light: #fde8e5;
+      --red-glow:  rgba(214,58,42,0.18);
+
+      --teal:      #0e8c7a;
+      --teal-light:#e2f5f2;
+
+      --gold:      #c97b1a;
+      --gold-light:#fdf2e2;
+
+      --blue:      #1a5db5;
+      --blue-light:#e5edf9;
+
+      --card-shadow: 0 2px 0 rgba(26,18,8,0.06), 0 8px 32px rgba(26,18,8,0.08);
+      --card-hover:  0 4px 0 var(--red), 0 12px 40px rgba(26,18,8,0.14);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
     body {
-      background: linear-gradient(to bottom right, #020617, #0f172a, #020617);
+      background: var(--bg);
+      color: var(--ink);
+      font-family: 'DM Sans', sans-serif;
       min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ─── NOISE TEXTURE ─── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.5;
+    }
+
+    /* ─── DECORATIVE CROSS MARKS ─── */
+    .deco-cross {
+      position: fixed;
+      font-size: 1.4rem;
+      color: var(--red);
+      opacity: 0.12;
+      pointer-events: none;
+      font-family: 'Space Mono', monospace;
+      z-index: 0;
+    }
+    .deco-cross.c1 { top: 8%;  left: 4%; }
+    .deco-cross.c2 { top: 20%; right: 6%; }
+    .deco-cross.c3 { bottom: 30%; left: 8%; }
+    .deco-cross.c4 { bottom: 12%; right: 4%; }
+    .deco-cross.c5 { top: 50%; left: 2%; }
+
+    /* ─── LAYOUT ─── */
+    .wrap {
+      position: relative;
+      z-index: 1;
+      max-width: 1060px;
+      margin: 0 auto;
+      padding: 0 24px 100px;
+    }
+
+    /* ─── TOP BAR ─── */
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 28px 0 0;
+      margin-bottom: 72px;
+      animation: fadeDown 0.6s ease both;
+    }
+    .logo-mark {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .logo-icon {
+      width: 36px; height: 36px;
+      background: var(--red);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff;
+      font-size: 1rem;
+      box-shadow: 0 4px 12px var(--red-glow);
+    }
+    .logo-text {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--ink);
+    }
+    .topbar-pills {
+      display: flex;
+      gap: 8px;
+    }
+    .topbar-pill {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 5px 12px;
+      border-radius: 100px;
+      border: 1px solid var(--line);
+      color: var(--muted);
+      background: var(--card);
+    }
+    .topbar-pill.active {
+      background: var(--ink);
+      color: #fff;
+      border-color: var(--ink);
+    }
+
+    /* ─── HERO ─── */
+    .hero {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: end;
+      gap: 32px;
+      margin-bottom: 56px;
+      animation: fadeUp 0.7s 0.1s ease both;
+    }
+    .hero-left {}
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--red-light);
+      border: 1px solid rgba(214,58,42,0.2);
+      color: var(--red);
+      font-family: 'Space Mono', monospace;
+      font-size: 0.68rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 6px 14px;
+      border-radius: 6px;
+      margin-bottom: 22px;
+    }
+    .eyebrow-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--red);
+      animation: heartbeat 1.6s ease infinite;
+    }
+    @keyframes heartbeat {
+      0%,100% { transform: scale(1); opacity: 1; }
+      40%     { transform: scale(1.5); opacity: 0.7; }
+      60%     { transform: scale(1); opacity: 1; }
+      80%     { transform: scale(1.3); opacity: 0.8; }
+    }
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.8rem, 6vw, 5rem);
+      font-weight: 900;
+      line-height: 1.05;
+      letter-spacing: -2px;
+      color: var(--ink);
+      margin-bottom: 18px;
+    }
+    h1 .accent {
+      color: var(--red);
+      font-style: italic;
+    }
+    .hero-sub {
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1.8;
+      font-weight: 400;
+      max-width: 460px;
+    }
+    .hero-stats {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      align-items: flex-end;
+    }
+    .stat-item {
+      text-align: left;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 16px 20px;
+      min-width: 140px;
+      box-shadow: var(--card-shadow);
+      transition: transform 0.2s;
+    }
+    .stat-item:hover { transform: translateX(-4px); }
+    .stat-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem;
+      font-weight: 900;
+      color: var(--ink);
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+    .stat-label {
+      font-size: 0.72rem;
+      color: var(--muted);
+      letter-spacing: 0.5px;
+    }
+    .stat-item.red .stat-num { color: var(--red); }
+    .stat-item.teal .stat-num { color: var(--teal); }
+    .stat-item.gold .stat-num { color: var(--gold); }
+
+    /* ─── FEATURE STRIP ─── */
+    .feat-strip {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1px;
+      background: var(--line);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      overflow: hidden;
+      margin-bottom: 48px;
+      animation: fadeUp 0.7s 0.2s ease both;
+    }
+    .feat-item {
+      background: var(--card);
+      padding: 22px 20px;
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      transition: background 0.2s;
+      cursor: default;
+    }
+    .feat-item:hover { background: var(--bg); }
+    .feat-icon-wrap {
+      flex-shrink: 0;
+      width: 38px; height: 38px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem;
+    }
+    .feat-icon-wrap.red  { background: var(--red-light);  color: var(--red); }
+    .feat-icon-wrap.teal { background: var(--teal-light); color: var(--teal); }
+    .feat-icon-wrap.gold { background: var(--gold-light); color: var(--gold); }
+    .feat-icon-wrap.blue { background: var(--blue-light); color: var(--blue); }
+    .feat-text h4 {
+      font-weight: 600;
+      font-size: 0.88rem;
+      color: var(--ink);
+      margin-bottom: 3px;
+    }
+    .feat-text p {
+      font-size: 0.76rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    /* ─── SEARCH SECTION ─── */
+    .search-section {
+      margin-bottom: 48px;
+      animation: fadeUp 0.7s 0.25s ease both;
+    }
+    .search-section-header {
+      display: flex;
+      align-items: baseline;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .search-section-header h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--ink);
+    }
+    .search-section-header span {
+      font-size: 0.8rem;
+      color: var(--muted);
+      font-family: 'Space Mono', monospace;
+    }
+
+    .search-box {
+      background: var(--card);
+      border: 2px solid var(--line);
+      border-radius: 20px;
+      padding: 6px 6px 6px 24px;
+      display: flex;
+      align-items: center;
+      gap: 0;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      box-shadow: var(--card-shadow);
+    }
+    .search-box:focus-within {
+      border-color: var(--red);
+      box-shadow: 0 0 0 4px var(--red-glow), var(--card-shadow);
+    }
+    .search-icon {
+      color: var(--muted);
+      font-size: 1rem;
+      margin-left: 4px; /* ltr compensation */
+      flex-shrink: 0;
+    }
+    #drugInput {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--ink);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1.05rem;
+      padding: 12px 16px;
+    }
+    #drugInput::placeholder { color: var(--muted); }
+    #searchBtn {
+      background: var(--ink);
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 14px 28px;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    #searchBtn:hover { background: var(--red); transform: scale(1.02); }
+    #searchBtn:active { transform: scale(0.98); }
+    #searchBtn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+    .btn-icon { font-size: 0.85rem; }
+
+    .quick-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 16px;
+      align-items: center;
+    }
+    .quick-label {
+      font-size: 0.72rem;
+      color: var(--muted);
+      font-family: 'Space Mono', monospace;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+    .q-tag {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      color: var(--ink2);
+      font-size: 0.82rem;
+      padding: 5px 14px;
+      border-radius: 100px;
+      cursor: pointer;
+      transition: all 0.18s;
+      box-shadow: 0 1px 0 var(--line);
+    }
+    .q-tag:hover {
+      background: var(--red-light);
+      border-color: rgba(214,58,42,0.25);
+      color: var(--red);
+    }
+    .q-tag i { font-size: 0.7rem; }
+
+    /* ─── LOADING ─── */
+    #loading {
+      display: none;
+      margin: 40px 0;
+    }
+    .loading-track {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 28px 32px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      box-shadow: var(--card-shadow);
+    }
+    .pulse-ring {
+      position: relative;
+      width: 44px; height: 44px;
+      flex-shrink: 0;
+    }
+    .pulse-ring::before,
+    .pulse-ring::after {
+      content: '';
+      position: absolute;
+      border-radius: 50%;
+    }
+    .pulse-ring::before {
+      inset: 0;
+      border: 2px solid var(--red);
+      animation: spin 1.2s linear infinite;
+      border-top-color: transparent;
+    }
+    .pulse-ring::after {
+      inset: 10px;
+      background: var(--red);
+      animation: pulsefill 1.2s ease infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes pulsefill {
+      0%,100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.7); }
+    }
+    .loading-info {}
+    .loading-title {
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: var(--ink);
+      margin-bottom: 4px;
+    }
+    .loading-sub {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--muted);
+      letter-spacing: 1px;
+    }
+    .loading-sub::after {
+      content: '';
+      animation: dots 1.5s steps(4, end) infinite;
+    }
+    @keyframes dots {
+      0%   { content: ''; }
+      25%  { content: '.'; }
+      50%  { content: '..'; }
+      75%  { content: '...'; }
+      100% { content: ''; }
+    }
+    .loading-bar-wrap {
+      flex: 1;
+    }
+    .loading-bar {
+      height: 3px;
+      background: var(--surface);
+      border-radius: 3px;
+      overflow: hidden;
+      margin-top: 12px;
+    }
+    .loading-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--red), var(--gold));
+      border-radius: 3px;
+      animation: barslide 1.4s ease-in-out infinite;
+      transform-origin: left;
+    }
+    @keyframes barslide {
+      0%   { width: 0%; margin-left: 0%; }
+      50%  { width: 60%; margin-left: 20%; }
+      100% { width: 0%; margin-left: 100%; }
+    }
+
+    /* ─── ERROR ─── */
+    #error {
+      display: none;
+      background: var(--red-light);
+      border: 1px solid rgba(214,58,42,0.25);
+      border-right: 4px solid var(--red);
+      color: var(--red);
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin-bottom: 24px;
+      font-size: 0.88rem;
+      align-items: center;
+      gap: 12px;
+    }
+    #error.show { display: flex; }
+
+    /* ─── RESULTS HEADER ─── */
+    .results-header {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .results-header.show { display: flex; }
+    .results-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--ink);
+    }
+    .results-title span { color: var(--red); }
+    .results-count {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--muted);
+      letter-spacing: 1px;
+      background: var(--surface);
+      padding: 4px 12px;
+      border-radius: 100px;
+      border: 1px solid var(--line);
+    }
+
+    /* ─── RESULTS GRID ─── */
+    #results {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 16px;
+    }
+
+    /* ─── DRUG CARD ─── */
+    .drug-card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 24px;
+      cursor: default;
+      transition: box-shadow 0.25s, transform 0.25s;
+      animation: cardIn 0.4s ease both;
+      box-shadow: var(--card-shadow);
+      position: relative;
+      overflow: hidden;
+    }
+    .drug-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--red);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.3s ease;
+      border-radius: 3px 3px 0 0;
+    }
+    .drug-card:hover {
+      box-shadow: var(--card-hover);
+      transform: translateY(-3px);
+    }
+    .drug-card:hover::before { transform: scaleX(1); }
+
+    @keyframes cardIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      gap: 12px;
+    }
+    .card-icon-name {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .card-icon {
+      width: 42px; height: 42px;
+      border-radius: 12px;
+      background: var(--red-light);
+      color: var(--red);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+    .drug-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--ink);
+      line-height: 1.2;
+      text-transform: capitalize;
+    }
+
+    /* score badge ring */
+    .score-ring {
+      flex-shrink: 0;
+      position: relative;
+      width: 48px; height: 48px;
+    }
+    .score-ring svg {
+      position: absolute;
+      inset: 0;
+      transform: rotate(-90deg);
+    }
+    .score-ring .ring-bg { fill: none; stroke: var(--surface); stroke-width: 3; }
+    .score-ring .ring-fill {
+      fill: none;
+      stroke: var(--red);
+      stroke-width: 3;
+      stroke-linecap: round;
+      transition: stroke-dasharray 0.6s ease;
+    }
+    .score-text {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.62rem;
+      font-weight: 700;
+      color: var(--red);
+    }
+
+    .divider {
+      height: 1px;
+      background: var(--line);
+      margin: 16px 0;
+    }
+
+    .card-fields {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .field {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    .field-icon {
+      width: 28px; height: 28px;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.72rem;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .field-icon.s  { background: var(--teal-light); color: var(--teal); }
+    .field-icon.d  { background: var(--gold-light); color: var(--gold); }
+    .field-icon.u  { background: var(--blue-light); color: var(--blue); }
+    .field-body {}
+    .field-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.62rem;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 2px;
+    }
+    .field-value {
+      font-size: 0.88rem;
+      color: var(--ink);
+      line-height: 1.5;
+      text-transform: capitalize;
+    }
+    .field-pill {
+      display: inline-block;
+      background: var(--gold-light);
+      color: var(--gold);
+      border: 1px solid rgba(201,123,26,0.2);
+      font-size: 0.78rem;
+      padding: 2px 10px;
+      border-radius: 6px;
+      text-transform: capitalize;
+    }
+
+    /* ─── EMPTY STATE ─── */
+    #emptyState {
+      text-align: center;
+      padding: 80px 32px;
+      animation: fadeUp 0.7s 0.35s ease both;
+    }
+    .empty-icon-wrap {
+      width: 80px; height: 80px;
+      border-radius: 20px;
+      background: var(--red-light);
+      border: 1px solid rgba(214,58,42,0.15);
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 2rem;
+      color: var(--red);
+      margin-bottom: 24px;
+      box-shadow: 0 8px 32px var(--red-glow);
+    }
+    #emptyState h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem;
+      font-weight: 900;
+      color: var(--ink);
+      margin-bottom: 12px;
+    }
+    #emptyState p {
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.9;
+      max-width: 440px;
+      margin: 0 auto 40px;
+    }
+
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+      max-width: 780px;
+      margin: 0 auto;
+    }
+    .step-card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 18px;
+      text-align: left;
+      box-shadow: var(--card-shadow);
+      transition: transform 0.2s;
+    }
+    .step-card:hover { transform: translateY(-3px); }
+    .step-num-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .step-num {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .step-icon {
+      width: 28px; height: 28px;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.75rem;
+    }
+    .step-icon.s1 { background: var(--red-light);  color: var(--red); }
+    .step-icon.s2 { background: var(--teal-light); color: var(--teal); }
+    .step-icon.s3 { background: var(--gold-light); color: var(--gold); }
+    .step-icon.s4 { background: var(--blue-light); color: var(--blue); }
+    .step-card p {
+      font-size: 0.82rem;
+      color: var(--ink2);
+      line-height: 1.6;
+    }
+
+    /* ─── NO RESULTS ─── */
+    .no-results {
+      grid-column: 1/-1;
+      text-align: center;
+      background: var(--card);
+      border: 1px dashed rgba(214,58,42,0.3);
+      border-radius: 18px;
+      padding: 48px 24px;
+      box-shadow: var(--card-shadow);
+    }
+    .no-results i { font-size: 2rem; color: var(--red); opacity: 0.5; margin-bottom: 16px; display: block; }
+    .no-results p { color: var(--muted); font-size: 0.95rem; line-height: 1.8; }
+    .no-results strong { color: var(--red); }
+
+    /* ─── UTILITIES ─── */
+    @keyframes fadeUp   { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeDown { from { opacity: 0; transform: translateY(-16px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* ─── SCROLLBAR ─── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: #c8bfb0; border-radius: 3px; }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 720px) {
+      .hero { grid-template-columns: 1fr; }
+      .hero-stats { flex-direction: row; align-items: flex-start; }
+      .feat-strip { grid-template-columns: 1fr 1fr; }
+      .topbar-pills { display: none; }
+    }
+    @media (max-width: 500px) {
+      .feat-strip { grid-template-columns: 1fr; }
+      h1 { font-size: 2.4rem; }
     }
   </style>
 </head>
-<body class="text-white p-6">
+<body>
 
-  <div class="max-w-6xl mx-auto">
+  <!-- decorative crosses -->
+  <div class="deco-cross c1">✚</div>
+  <div class="deco-cross c2">✚</div>
+  <div class="deco-cross c3">✚</div>
+  <div class="deco-cross c4">✚</div>
+  <div class="deco-cross c5">✚</div>
 
-    <!-- HEADER -->
+  <div class="wrap">
 
-    <div class="text-center mb-10">
+    <!-- TOP BAR -->
+    <nav class="topbar">
+      <div class="logo-mark">
+        <div class="logo-icon"><i class="fa-solid fa-staff-snake"></i></div>
+        <span class="logo-text">MediSearch</span>
+      </div>
+      <div class="topbar-pills">
+        <span class="topbar-pill active">v2.0</span>
+        <span class="topbar-pill"><i class="fa-solid fa-circle" style="color:var(--teal);font-size:7px;vertical-align:middle;margin-left:4px"></i> Live</span>
+        <span class="topbar-pill">AI Powered</span>
+      </div>
+    </nav>
 
-      <h1 class="text-5xl font-black mb-5">
-        AI Medical Recommendation System
-      </h1>
-
-      <p class="text-slate-300 text-lg leading-8 max-w-3xl mx-auto">
-        نظام ذكي للبحث عن الأدوية باستخدام Machine Learning
-        <br>
-        يدعم البحث بالعربي والإنجليزي وتصحيح الأخطاء الإملائية
-      </p>
+    <!-- HERO -->
+    <div class="hero">
+      <div class="hero-left">
+        <div class="hero-eyebrow">
+          <span class="eyebrow-dot"></span>
+          نظام ذكاء اصطناعي طبي
+        </div>
+        <h1>اكتشف<br><span class="accent">البديل</span><br>المثالي</h1>
+        <p class="hero-sub">
+          ابحث عن أي دواء بالعربي أو الإنجليزي — يحلل النظام المادة الفعالة والتركيب الطبي ليقترح أفضل البدائل المتاحة
+        </p>
+      </div>
+      <div class="hero-stats">
+        <div class="stat-item red">
+          <div class="stat-num">AI</div>
+          <div class="stat-label">محرك ذكي</div>
+        </div>
+        <div class="stat-item teal">
+          <div class="stat-num">TF</div>
+          <div class="stat-label">TF-IDF Model</div>
+        </div>
+        <div class="stat-item gold">
+          <div class="stat-num">AR/EN</div>
+          <div class="stat-label">ثنائي اللغة</div>
+        </div>
+      </div>
     </div>
 
     <!-- FEATURES -->
-
-    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-5 mb-10">
-
-      <div class="bg-slate-800 border border-slate-700 rounded-2xl p-5">
-        <h3 class="text-xl font-bold mb-3">Arabic Search</h3>
-
-        <p class="text-slate-400 leading-7">
-          يدعم البحث بالعربي مثل:
-          <br>
-          بانادول - بروفين
-        </p>
+    <div class="feat-strip">
+      <div class="feat-item">
+        <div class="feat-icon-wrap red"><i class="fa-solid fa-language"></i></div>
+        <div class="feat-text">
+          <h4>بحث ثنائي اللغة</h4>
+          <p>عربي وإنجليزي بدون قيود</p>
+        </div>
       </div>
-
-      <div class="bg-slate-800 border border-slate-700 rounded-2xl p-5">
-        <h3 class="text-xl font-bold mb-3">Typo Correction</h3>
-
-        <p class="text-slate-400 leading-7">
-          يصلح الأخطاء الإملائية تلقائيًا
-          <br>
-          مثل: ibuprfen
-        </p>
+      <div class="feat-item">
+        <div class="feat-icon-wrap teal"><i class="fa-solid fa-spell-check"></i></div>
+        <div class="feat-text">
+          <h4>تصحيح تلقائي</h4>
+          <p>يصلح الأخطاء الإملائية فورًا</p>
+        </div>
       </div>
-
-      <div class="bg-slate-800 border border-slate-700 rounded-2xl p-5">
-        <h3 class="text-xl font-bold mb-3">Machine Learning</h3>
-
-        <p class="text-slate-400 leading-7">
-          يستخدم TF-IDF و Cosine Similarity
-          لتحليل التشابه الطبي
-        </p>
+      <div class="feat-item">
+        <div class="feat-icon-wrap gold"><i class="fa-solid fa-brain"></i></div>
+        <div class="feat-text">
+          <h4>محرك ML</h4>
+          <p>Cosine Similarity & TF-IDF</p>
+        </div>
       </div>
-
-      <div class="bg-slate-800 border border-slate-700 rounded-2xl p-5">
-        <h3 class="text-xl font-bold mb-3">Smart Recommendations</h3>
-
-        <p class="text-slate-400 leading-7">
-          يقترح أدوية مشابهة بناءً على
-          المادة الفعالة والاستخدام
-        </p>
+      <div class="feat-item">
+        <div class="feat-icon-wrap blue"><i class="fa-solid fa-pills"></i></div>
+        <div class="feat-text">
+          <h4>بدائل ذكية</h4>
+          <p>مبنية على المادة الفعالة</p>
+        </div>
       </div>
     </div>
 
-    <!-- SEARCH SECTION -->
+    <!-- SEARCH -->
+    <div class="search-section">
+      <div class="search-section-header">
+        <h2>ابحث الآن</h2>
+        <span>// اكتب واتركه يعمل</span>
+      </div>
 
-    <div class="bg-slate-900 border border-slate-700 rounded-3xl p-6 mb-8">
-
-      <h2 class="text-3xl font-black text-center mb-4">
-        Smart Drug Search
-      </h2>
-
-      <p class="text-center text-slate-400 mb-6 leading-8">
-        اكتب اسم الدواء بالعربي أو الإنجليزي
-        <br>
-        مثال:
-        Panadol - Ibuprofen - بانادول - بروفين
-      </p>
-
-      <div class="flex flex-col md:flex-row gap-4">
-
+      <div class="search-box">
+        <i class="fa-solid fa-magnifying-glass search-icon"></i>
         <input
           id="drugInput"
           type="text"
-          placeholder="Search drug name..."
-          class="flex-1 bg-slate-800 border border-slate-600 rounded-2xl px-5 py-4 text-lg outline-none focus:border-cyan-400"
+          placeholder="اكتب اسم الدواء... مثال: Panadol أو بانادول"
+          autocomplete="off"
+          spellcheck="false"
         />
-
-        <button
-          onclick="searchDrug()"
-          class="bg-cyan-400 hover:bg-cyan-300 transition-all text-black font-bold px-8 py-4 rounded-2xl text-lg"
-        >
-          Search
+        <button id="searchBtn" onclick="searchDrug()">
+          <span>بحث</span>
+          <i class="fa-solid fa-arrow-left btn-icon"></i>
         </button>
+      </div>
+
+      <div class="quick-tags">
+        <span class="quick-label">أمثلة:</span>
+        <span class="q-tag" onclick="fillAndSearch('Panadol')"><i class="fa-solid fa-capsules"></i> Panadol</span>
+        <span class="q-tag" onclick="fillAndSearch('Ibuprofen')"><i class="fa-solid fa-capsules"></i> Ibuprofen</span>
+        <span class="q-tag" onclick="fillAndSearch('بانادول')"><i class="fa-solid fa-capsules"></i> بانادول</span>
+        <span class="q-tag" onclick="fillAndSearch('بروفين')"><i class="fa-solid fa-capsules"></i> بروفين</span>
+        <span class="q-tag" onclick="fillAndSearch('Amoxicillin')"><i class="fa-solid fa-capsules"></i> Amoxicillin</span>
       </div>
     </div>
 
     <!-- LOADING -->
-
-    <div
-      id="loading"
-      class="hidden text-center text-cyan-400 text-2xl font-bold py-6"
-    >
-      Searching AI Medical Database...
+    <div id="loading">
+      <div class="loading-track">
+        <div class="pulse-ring"></div>
+        <div class="loading-info">
+          <div class="loading-title">جاري تحليل قاعدة البيانات الطبية</div>
+          <div class="loading-sub">يبحث عن أفضل البدائل</div>
+        </div>
+        <div class="loading-bar-wrap">
+          <div class="loading-bar"><div class="loading-bar-fill"></div></div>
+        </div>
+      </div>
     </div>
 
     <!-- ERROR -->
+    <div id="error">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+      <span id="errorMsg"></span>
+    </div>
 
-    <div
-      id="error"
-      class="hidden bg-red-500/20 border border-red-500 text-red-300 rounded-2xl p-5 mb-6 text-center"
-    ></div>
+    <!-- RESULTS HEADER -->
+    <div class="results-header" id="resultsHeader">
+      <div class="results-title">نتائج البحث عن <span id="resultsQuery"></span></div>
+      <span class="results-count" id="resultsCount"></span>
+    </div>
 
     <!-- RESULTS -->
-
-    <div id="results" class="grid lg:grid-cols-2 gap-6"></div>
+    <div id="results"></div>
 
     <!-- EMPTY STATE -->
-
-    <div
-      id="emptyState"
-      class="bg-slate-900 border border-slate-700 rounded-3xl p-8 text-center text-slate-400 leading-8 mt-6"
-    >
-      <h3 class="text-3xl font-black text-white mb-4">
-        What Does This System Do?
-      </h3>
-
-      <p>
-        This AI-powered system analyzes medical drug similarity using Machine Learning.
-      </p>
-
-      <p class="mt-3">
-        النظام يقوم بتحليل الأدوية واقتراح بدائل مشابهة طبيًا
-        باستخدام الذكاء الاصطناعي.
-      </p>
-
-      <div class="mt-6 text-cyan-400 font-bold">
-        Try Searching:
-        <br>
-        Panadol / Ibuprofen / بانادول / بروفين
+    <div id="emptyState">
+      <div class="empty-icon-wrap"><i class="fa-solid fa-microscope"></i></div>
+      <h3>كيف يعمل النظام؟</h3>
+      <p>اكتب اسم أي دواء وسيقوم الذكاء الاصطناعي بتحليل المادة الفعالة والاستخدام الطبي لاقتراح أفضل البدائل المتاحة</p>
+      <div class="steps-grid">
+        <div class="step-card">
+          <div class="step-num-wrap">
+            <span class="step-num">01</span>
+            <span class="step-icon s1"><i class="fa-solid fa-keyboard"></i></span>
+          </div>
+          <p>اكتب اسم الدواء بأي لغة</p>
+        </div>
+        <div class="step-card">
+          <div class="step-num-wrap">
+            <span class="step-num">02</span>
+            <span class="step-icon s2"><i class="fa-solid fa-flask"></i></span>
+          </div>
+          <p>يحلل المادة الفعالة والتركيب</p>
+        </div>
+        <div class="step-card">
+          <div class="step-num-wrap">
+            <span class="step-num">03</span>
+            <span class="step-icon s3"><i class="fa-solid fa-chart-bar"></i></span>
+          </div>
+          <p>يحسب درجة التشابه بدقة عالية</p>
+        </div>
+        <div class="step-card">
+          <div class="step-num-wrap">
+            <span class="step-num">04</span>
+            <span class="step-icon s4"><i class="fa-solid fa-list-check"></i></span>
+          </div>
+          <p>يعرض البدائل مرتبة تنازليًا</p>
+        </div>
       </div>
     </div>
+
   </div>
 
   <script>
-
-    // =====================================================
-    // API URL
-    // =====================================================
-
     const API_BASE = "http://38.211.244.61:8000";
+    let searchTimer = null;
 
-    // =====================================================
-    // ENTER SUPPORT
-    // =====================================================
+    const input = document.getElementById("drugInput");
+    const resultsHeader = document.getElementById("resultsHeader");
+    const resultsQueryEl = document.getElementById("resultsQuery");
+    const resultsCountEl = document.getElementById("resultsCount");
 
-    document
-      .getElementById("drugInput")
-      .addEventListener("keydown", function(event) {
+    // ── Search on input (1s debounce) ──
+    input.addEventListener("input", () => {
+      clearTimeout(searchTimer);
+      const val = input.value.trim();
+      if (!val) return;
+      searchTimer = setTimeout(() => searchDrug(), 1000);
+    });
 
-        if (event.key === "Enter") {
-          searchDrug();
-        }
-      });
+    // Keep Enter as instant trigger
+    input.addEventListener("keydown", e => {
+      if (e.key === "Enter") {
+        clearTimeout(searchTimer);
+        searchDrug();
+      }
+    });
 
-    // =====================================================
-    // SEARCH FUNCTION
-    // =====================================================
+    function fillAndSearch(name) {
+      clearTimeout(searchTimer);
+      input.value = name;
+      searchDrug();
+    }
+
+    function setLoading(on) {
+      document.getElementById("loading").style.display = on ? "block" : "none";
+      document.getElementById("searchBtn").disabled = on;
+    }
+
+    function showError(msg) {
+      const el = document.getElementById("error");
+      document.getElementById("errorMsg").textContent = msg;
+      el.classList.add("show");
+      el.style.display = "flex";
+    }
+    function hideError() {
+      const el = document.getElementById("error");
+      el.classList.remove("show");
+      el.style.display = "none";
+    }
+
+    function scoreToPercent(score) {
+      // score might be 0-1 float or 0-100
+      const n = parseFloat(score);
+      if (isNaN(n)) return 50;
+      return n <= 1 ? Math.round(n * 100) : Math.round(n);
+    }
 
     async function searchDrug() {
-
-      const query = document
-        .getElementById("drugInput")
-        .value
-        .trim();
-
+      const query = input.value.trim();
       if (!query) return;
 
-      const loading = document.getElementById("loading");
       const resultsDiv = document.getElementById("results");
-      const errorDiv = document.getElementById("error");
       const emptyState = document.getElementById("emptyState");
 
-      loading.classList.remove("hidden");
-      errorDiv.classList.add("hidden");
+      setLoading(true);
+      hideError();
       resultsDiv.innerHTML = "";
       emptyState.style.display = "none";
+      resultsHeader.classList.remove("show");
 
       try {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 15000);
 
         const response = await fetch(
-          `${API_BASE}/recommend/${encodeURIComponent(query)}`
+          `${API_BASE}/recommend/${encodeURIComponent(query)}`,
+          { signal: controller.signal }
         );
 
-        const data = await response.json();
+        clearTimeout(timeout);
 
-        loading.classList.add("hidden");
+        if (!response.ok) throw new Error(`Server responded with ${response.status}`);
+
+        const data = await response.json();
+        setLoading(false);
 
         if (!data.recommendations || data.recommendations.length === 0) {
-
           resultsDiv.innerHTML = `
-            <div class="col-span-full bg-slate-900 border border-slate-700 rounded-3xl p-8 text-center text-red-300 text-xl">
-              No recommendations found
+            <div class="no-results">
+              <i class="fa-solid fa-circle-xmark"></i>
+              <p>لم يتم العثور على نتائج لـ <strong>"${escapeHtml(query)}"</strong><br>
+              جرب كتابة اسم مختلف أو تأكد من الإملاء</p>
             </div>
           `;
-
           return;
         }
 
-        data.recommendations.forEach(drug => {
+        // Show header
+        resultsQueryEl.textContent = `"${query}"`;
+        resultsCountEl.textContent = `${data.recommendations.length} نتيجة`;
+        resultsHeader.classList.add("show");
 
-          const card = `
-            <div class="bg-slate-900 border border-slate-700 rounded-3xl p-6 hover:border-cyan-400 transition-all">
+        const r = 20; // radius
+        const C = 2 * Math.PI * r; // circumference ≈ 125.66
 
-              <div class="flex items-center justify-between mb-5">
+        data.recommendations.forEach((drug, i) => {
+          const pct = scoreToPercent(drug.similarity_score);
+          const dash = (pct / 100) * C;
 
-                <h2 class="text-2xl font-black text-cyan-400 capitalize">
-                  ${drug.drug_name}
-                </h2>
-
-                <div class="bg-cyan-500/20 text-cyan-300 px-4 py-2 rounded-xl font-bold">
-                  ${drug.similarity_score}
+          const card = document.createElement("div");
+          card.className = "drug-card";
+          card.style.animationDelay = `${i * 0.07}s`;
+          card.innerHTML = `
+            <div class="card-header">
+              <div class="card-icon-name">
+                <div class="card-icon"><i class="fa-solid fa-capsules"></i></div>
+                <div class="drug-name">${escapeHtml(drug.drug_name || 'Unknown')}</div>
+              </div>
+              <div class="score-ring">
+                <svg viewBox="0 0 48 48" width="48" height="48">
+                  <circle class="ring-bg"   cx="24" cy="24" r="${r}"/>
+                  <circle class="ring-fill" cx="24" cy="24" r="${r}"
+                    stroke-dasharray="${dash.toFixed(1)} ${C.toFixed(1)}"
+                  />
+                </svg>
+                <div class="score-text">${pct}%</div>
+              </div>
+            </div>
+            <div class="divider"></div>
+            <div class="card-fields">
+              <div class="field">
+                <div class="field-icon s"><i class="fa-solid fa-atom"></i></div>
+                <div class="field-body">
+                  <div class="field-label">Active Substance</div>
+                  <div class="field-value">${escapeHtml(drug.active_substance || '—')}</div>
                 </div>
               </div>
-
-              <div class="space-y-4 text-slate-300">
-
-                <div>
-                  <span class="font-bold text-white">
-                    Active Substance:
-                  </span>
-                  <br>
-                  <span class="capitalize">
-                    ${drug.active_substance || "Unknown"}
-                  </span>
+              <div class="field">
+                <div class="field-icon d"><i class="fa-solid fa-tablets"></i></div>
+                <div class="field-body">
+                  <div class="field-label">Dosage Form</div>
+                  <span class="field-pill">${escapeHtml(drug.dosage_form || '—')}</span>
                 </div>
-
-                <div>
-                  <span class="font-bold text-white">
-                    Dosage Form:
-                  </span>
-                  <br>
-                  <span class="capitalize">
-                    ${drug.dosage_form || "Unknown"}
-                  </span>
-                </div>
-
-                <div>
-                  <span class="font-bold text-white">
-                    Medical Use:
-                  </span>
-                  <br>
-                  <span class="capitalize">
-                    ${drug.indication || "Unknown"}
-                  </span>
+              </div>
+              <div class="field">
+                <div class="field-icon u"><i class="fa-solid fa-stethoscope"></i></div>
+                <div class="field-body">
+                  <div class="field-label">Medical Use</div>
+                  <div class="field-value">${escapeHtml(drug.indication || '—')}</div>
                 </div>
               </div>
             </div>
           `;
-
-          resultsDiv.innerHTML += card;
+          resultsDiv.appendChild(card);
         });
 
-      } catch (error) {
-
-        loading.classList.add("hidden");
-
-        errorDiv.classList.remove("hidden");
-
-        errorDiv.innerHTML = "Failed to connect to AI Medical API";
-
-        console.error(error);
+      } catch (err) {
+        setLoading(false);
+        if (err.name === "AbortError") {
+          showError("انتهت مهلة الاتصال — الخادم لم يستجب في الوقت المحدد");
+        } else if (!navigator.onLine) {
+          showError("لا يوجد اتصال بالإنترنت — تحقق من شبكتك");
+        } else {
+          showError("تعذّر الاتصال بقاعدة البيانات الطبية — يرجى المحاولة لاحقًا");
+        }
+        console.error("[MediSearch]", err);
       }
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, "&amp;").replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
     }
   </script>
 </body>
