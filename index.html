@@ -1,15 +1,14 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl" data-lang="ar" data-theme="light">
+<html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>MediSearch AI</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
 
   <style>
-    /* ─── LIGHT THEME VARS ─── */
     :root {
       --bg:        #f5f0e8;
       --surface:   #ede8de;
@@ -34,42 +33,10 @@
 
       --card-shadow: 0 2px 0 rgba(26,18,8,0.06), 0 8px 32px rgba(26,18,8,0.08);
       --card-hover:  0 4px 0 var(--red), 0 12px 40px rgba(26,18,8,0.14);
-
-      --toggle-bg:   #e8e0d4;
-      --toggle-icon: #4a3f2f;
-    }
-
-    /* ─── DARK THEME VARS ─── */
-    [data-theme="dark"] {
-      --bg:        #111009;
-      --surface:   #1c1a13;
-      --card:      #201e16;
-      --ink:       #f0ece4;
-      --ink2:      #c0b8a8;
-      --muted:     #6a6055;
-      --line:      rgba(240,236,228,0.09);
-
-      --red:       #e05040;
-      --red-light: rgba(224,80,64,0.12);
-      --red-glow:  rgba(224,80,64,0.22);
-
-      --teal:      #2aab98;
-      --teal-light:rgba(42,171,152,0.12);
-
-      --gold:      #e09030;
-      --gold-light:rgba(224,144,48,0.12);
-
-      --blue:      #4080d8;
-      --blue-light:rgba(64,128,216,0.12);
-
-      --card-shadow: 0 2px 0 rgba(0,0,0,0.3), 0 8px 32px rgba(0,0,0,0.3);
-      --card-hover:  0 4px 0 var(--red), 0 12px 40px rgba(0,0,0,0.4);
-
-      --toggle-bg:   #2a2820;
-      --toggle-icon: #c0b8a8;
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
+
     html { scroll-behavior: smooth; }
 
     body {
@@ -78,10 +45,9 @@
       font-family: 'DM Sans', sans-serif;
       min-height: 100vh;
       overflow-x: hidden;
-      transition: background 0.35s ease, color 0.35s ease;
     }
 
-    /* ─── NOISE ─── */
+    /* ─── NOISE TEXTURE ─── */
     body::before {
       content: '';
       position: fixed;
@@ -92,12 +58,12 @@
       opacity: 0.5;
     }
 
-    /* ─── DECO ─── */
+    /* ─── DECORATIVE CROSS MARKS ─── */
     .deco-cross {
       position: fixed;
       font-size: 1.4rem;
       color: var(--red);
-      opacity: 0.10;
+      opacity: 0.12;
       pointer-events: none;
       font-family: 'Space Mono', monospace;
       z-index: 0;
@@ -147,41 +113,11 @@
       letter-spacing: 2px;
       text-transform: uppercase;
       color: var(--ink);
-      transition: color 0.35s;
     }
-
-    .topbar-right {
+    .topbar-pills {
       display: flex;
-      align-items: center;
       gap: 8px;
     }
-
-    /* ─── TOGGLE BTN (shared style) ─── */
-    .ctrl-btn {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      background: var(--toggle-bg);
-      border: 1px solid var(--line);
-      color: var(--toggle-icon);
-      font-family: 'Space Mono', monospace;
-      font-size: 0.66rem;
-      font-weight: 700;
-      letter-spacing: 1.2px;
-      text-transform: uppercase;
-      padding: 7px 14px;
-      border-radius: 100px;
-      cursor: pointer;
-      transition: all 0.25s ease;
-      white-space: nowrap;
-    }
-    .ctrl-btn:hover {
-      background: var(--red);
-      color: #fff;
-      border-color: var(--red);
-    }
-    .ctrl-btn i { font-size: 0.75rem; }
-
     .topbar-pill {
       font-family: 'Space Mono', monospace;
       font-size: 0.65rem;
@@ -192,11 +128,10 @@
       border: 1px solid var(--line);
       color: var(--muted);
       background: var(--card);
-      transition: all 0.35s;
     }
     .topbar-pill.active {
       background: var(--ink);
-      color: var(--bg);
+      color: #fff;
       border-color: var(--ink);
     }
 
@@ -209,6 +144,7 @@
       margin-bottom: 56px;
       animation: fadeUp 0.7s 0.1s ease both;
     }
+    .hero-left {}
     .hero-eyebrow {
       display: inline-flex;
       align-items: center;
@@ -236,33 +172,26 @@
       60%     { transform: scale(1); opacity: 1; }
       80%     { transform: scale(1.3); opacity: 0.8; }
     }
-
-    /* ─── SOFT TITLE FONT (Cormorant Garamond) ─── */
     h1 {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: clamp(3rem, 6.5vw, 5.6rem);
-      font-weight: 600;
-      line-height: 1.08;
-      letter-spacing: -1px;
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.8rem, 6vw, 5rem);
+      font-weight: 900;
+      line-height: 1.05;
+      letter-spacing: -2px;
       color: var(--ink);
       margin-bottom: 18px;
-      transition: color 0.35s;
     }
     h1 .accent {
       color: var(--red);
       font-style: italic;
-      font-weight: 400;
     }
-
     .hero-sub {
       color: var(--muted);
       font-size: 1rem;
       line-height: 1.8;
       font-weight: 400;
       max-width: 460px;
-      transition: color 0.35s;
     }
-
     .hero-stats {
       display: flex;
       flex-direction: column;
@@ -270,23 +199,23 @@
       align-items: flex-end;
     }
     .stat-item {
+      text-align: left;
       background: var(--card);
       border: 1px solid var(--line);
       border-radius: 14px;
       padding: 16px 20px;
       min-width: 140px;
       box-shadow: var(--card-shadow);
-      transition: transform 0.2s, background 0.35s, border-color 0.35s;
+      transition: transform 0.2s;
     }
     .stat-item:hover { transform: translateX(-4px); }
     .stat-num {
-      font-family: 'Cormorant Garamond', serif;
+      font-family: 'Playfair Display', serif;
       font-size: 1.8rem;
-      font-weight: 700;
+      font-weight: 900;
       color: var(--ink);
       line-height: 1;
       margin-bottom: 4px;
-      transition: color 0.35s;
     }
     .stat-label {
       font-size: 0.72rem;
@@ -308,7 +237,6 @@
       overflow: hidden;
       margin-bottom: 48px;
       animation: fadeUp 0.7s 0.2s ease both;
-      transition: border-color 0.35s;
     }
     .feat-item {
       background: var(--card);
@@ -319,14 +247,13 @@
       transition: background 0.2s;
       cursor: default;
     }
-    .feat-item:hover { background: var(--surface); }
+    .feat-item:hover { background: var(--bg); }
     .feat-icon-wrap {
       flex-shrink: 0;
       width: 38px; height: 38px;
       border-radius: 10px;
       display: flex; align-items: center; justify-content: center;
       font-size: 1rem;
-      transition: background 0.35s;
     }
     .feat-icon-wrap.red  { background: var(--red-light);  color: var(--red); }
     .feat-icon-wrap.teal { background: var(--teal-light); color: var(--teal); }
@@ -337,7 +264,6 @@
       font-size: 0.88rem;
       color: var(--ink);
       margin-bottom: 3px;
-      transition: color 0.35s;
     }
     .feat-text p {
       font-size: 0.76rem;
@@ -357,11 +283,10 @@
       margin-bottom: 20px;
     }
     .search-section-header h2 {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.7rem;
-      font-weight: 600;
+      font-family: 'Playfair Display', serif;
+      font-size: 1.6rem;
+      font-weight: 700;
       color: var(--ink);
-      transition: color 0.35s;
     }
     .search-section-header span {
       font-size: 0.8rem;
@@ -369,18 +294,16 @@
       font-family: 'Space Mono', monospace;
     }
 
-    /* Search input — no button */
     .search-box {
       background: var(--card);
       border: 2px solid var(--line);
       border-radius: 20px;
-      padding: 6px 20px;
+      padding: 6px 6px 6px 24px;
       display: flex;
       align-items: center;
-      gap: 14px;
-      transition: border-color 0.2s, box-shadow 0.2s, background 0.35s;
+      gap: 0;
+      transition: border-color 0.2s, box-shadow 0.2s;
       box-shadow: var(--card-shadow);
-      position: relative;
     }
     .search-box:focus-within {
       border-color: var(--red);
@@ -389,11 +312,9 @@
     .search-icon {
       color: var(--muted);
       font-size: 1rem;
+      margin-left: 4px; /* ltr compensation */
       flex-shrink: 0;
-      transition: color 0.25s;
     }
-    .search-box:focus-within .search-icon { color: var(--red); }
-
     #drugInput {
       flex: 1;
       background: transparent;
@@ -402,41 +323,31 @@
       color: var(--ink);
       font-family: 'DM Sans', sans-serif;
       font-size: 1.05rem;
-      padding: 14px 0;
-      transition: color 0.35s;
+      padding: 12px 16px;
     }
     #drugInput::placeholder { color: var(--muted); }
-
-    /* Typing indicator */
-    .typing-badge {
-      display: none;
-      align-items: center;
-      gap: 6px;
-      background: var(--red-light);
-      color: var(--red);
+    #searchBtn {
+      background: var(--ink);
+      color: #fff;
+      border: none;
+      border-radius: 14px;
       font-family: 'Space Mono', monospace;
-      font-size: 0.62rem;
+      font-size: 0.8rem;
+      font-weight: 700;
       letter-spacing: 1px;
-      padding: 5px 12px;
-      border-radius: 100px;
+      text-transform: uppercase;
+      padding: 14px 28px;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s;
       white-space: nowrap;
-      flex-shrink: 0;
-      animation: fadeIn 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
-    .typing-badge.show { display: flex; }
-    .typing-dot {
-      width: 5px; height: 5px;
-      border-radius: 50%;
-      background: var(--red);
-      animation: tdot 0.8s ease infinite;
-    }
-    .typing-dot:nth-child(2) { animation-delay: 0.15s; }
-    .typing-dot:nth-child(3) { animation-delay: 0.3s; }
-    @keyframes tdot {
-      0%,80%,100% { transform: scale(1); opacity: 0.5; }
-      40% { transform: scale(1.4); opacity: 1; }
-    }
-    @keyframes fadeIn { from { opacity:0; transform:scale(0.92); } to { opacity:1; transform:scale(1); } }
+    #searchBtn:hover { background: var(--red); transform: scale(1.02); }
+    #searchBtn:active { transform: scale(0.98); }
+    #searchBtn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+    .btn-icon { font-size: 0.85rem; }
 
     .quick-tags {
       display: flex;
@@ -474,7 +385,10 @@
     .q-tag i { font-size: 0.7rem; }
 
     /* ─── LOADING ─── */
-    #loading { display: none; margin: 40px 0; }
+    #loading {
+      display: none;
+      margin: 40px 0;
+    }
     .loading-track {
       background: var(--card);
       border: 1px solid var(--line);
@@ -484,7 +398,6 @@
       align-items: center;
       gap: 20px;
       box-shadow: var(--card-shadow);
-      transition: background 0.35s, border-color 0.35s;
     }
     .pulse-ring {
       position: relative;
@@ -513,12 +426,12 @@
       0%,100% { opacity: 1; transform: scale(1); }
       50% { opacity: 0.4; transform: scale(0.7); }
     }
+    .loading-info {}
     .loading-title {
       font-weight: 600;
       font-size: 0.95rem;
       color: var(--ink);
       margin-bottom: 4px;
-      transition: color 0.35s;
     }
     .loading-sub {
       font-family: 'Space Mono', monospace;
@@ -537,7 +450,9 @@
       75%  { content: '...'; }
       100% { content: ''; }
     }
-    .loading-bar-wrap { flex: 1; }
+    .loading-bar-wrap {
+      flex: 1;
+    }
     .loading-bar {
       height: 3px;
       background: var(--surface);
@@ -550,11 +465,12 @@
       background: linear-gradient(90deg, var(--red), var(--gold));
       border-radius: 3px;
       animation: barslide 1.4s ease-in-out infinite;
+      transform-origin: left;
     }
     @keyframes barslide {
-      0%   { width: 0%;  margin-left: 0%; }
+      0%   { width: 0%; margin-left: 0%; }
       50%  { width: 60%; margin-left: 20%; }
-      100% { width: 0%;  margin-left: 100%; }
+      100% { width: 0%; margin-left: 100%; }
     }
 
     /* ─── ERROR ─── */
@@ -582,11 +498,10 @@
     }
     .results-header.show { display: flex; }
     .results-title {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.4rem;
-      font-weight: 600;
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem;
+      font-weight: 700;
       color: var(--ink);
-      transition: color 0.35s;
     }
     .results-title span { color: var(--red); }
     .results-count {
@@ -598,7 +513,6 @@
       padding: 4px 12px;
       border-radius: 100px;
       border: 1px solid var(--line);
-      transition: background 0.35s, border-color 0.35s;
     }
 
     /* ─── RESULTS GRID ─── */
@@ -614,7 +528,8 @@
       border: 1px solid var(--line);
       border-radius: 18px;
       padding: 24px;
-      transition: box-shadow 0.25s, transform 0.25s, background 0.35s, border-color 0.35s;
+      cursor: default;
+      transition: box-shadow 0.25s, transform 0.25s;
       animation: cardIn 0.4s ease both;
       box-shadow: var(--card-shadow);
       position: relative;
@@ -631,8 +546,12 @@
       transition: transform 0.3s ease;
       border-radius: 3px 3px 0 0;
     }
-    .drug-card:hover { box-shadow: var(--card-hover); transform: translateY(-3px); }
+    .drug-card:hover {
+      box-shadow: var(--card-hover);
+      transform: translateY(-3px);
+    }
     .drug-card:hover::before { transform: scaleX(1); }
+
     @keyframes cardIn {
       from { opacity: 0; transform: translateY(20px); }
       to   { opacity: 1; transform: translateY(0); }
@@ -658,18 +577,17 @@
       display: flex; align-items: center; justify-content: center;
       font-size: 1.1rem;
       flex-shrink: 0;
-      transition: background 0.35s;
     }
     .drug-name {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.2rem;
-      font-weight: 600;
+      font-family: 'Playfair Display', serif;
+      font-size: 1.15rem;
+      font-weight: 700;
       color: var(--ink);
       line-height: 1.2;
       text-transform: capitalize;
-      transition: color 0.35s;
     }
 
+    /* score badge ring */
     .score-ring {
       flex-shrink: 0;
       position: relative;
@@ -686,6 +604,7 @@
       stroke: var(--red);
       stroke-width: 3;
       stroke-linecap: round;
+      transition: stroke-dasharray 0.6s ease;
     }
     .score-text {
       position: absolute;
@@ -699,10 +618,23 @@
       color: var(--red);
     }
 
-    .divider { height: 1px; background: var(--line); margin: 16px 0; }
+    .divider {
+      height: 1px;
+      background: var(--line);
+      margin: 16px 0;
+    }
 
-    .card-fields { display: flex; flex-direction: column; gap: 12px; }
-    .field { display: flex; align-items: flex-start; gap: 10px; }
+    .card-fields {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .field {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
     .field-icon {
       width: 28px; height: 28px;
       border-radius: 8px;
@@ -710,11 +642,11 @@
       font-size: 0.72rem;
       flex-shrink: 0;
       margin-top: 2px;
-      transition: background 0.35s;
     }
     .field-icon.s  { background: var(--teal-light); color: var(--teal); }
     .field-icon.d  { background: var(--gold-light); color: var(--gold); }
     .field-icon.u  { background: var(--blue-light); color: var(--blue); }
+    .field-body {}
     .field-label {
       font-family: 'Space Mono', monospace;
       font-size: 0.62rem;
@@ -728,7 +660,6 @@
       color: var(--ink);
       line-height: 1.5;
       text-transform: capitalize;
-      transition: color 0.35s;
     }
     .field-pill {
       display: inline-block;
@@ -739,7 +670,6 @@
       padding: 2px 10px;
       border-radius: 6px;
       text-transform: capitalize;
-      transition: background 0.35s;
     }
 
     /* ─── EMPTY STATE ─── */
@@ -758,15 +688,13 @@
       color: var(--red);
       margin-bottom: 24px;
       box-shadow: 0 8px 32px var(--red-glow);
-      transition: background 0.35s;
     }
     #emptyState h3 {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 2rem;
-      font-weight: 600;
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem;
+      font-weight: 900;
       color: var(--ink);
       margin-bottom: 12px;
-      transition: color 0.35s;
     }
     #emptyState p {
       color: var(--muted);
@@ -790,7 +718,7 @@
       padding: 18px;
       text-align: left;
       box-shadow: var(--card-shadow);
-      transition: transform 0.2s, background 0.35s, border-color 0.35s;
+      transition: transform 0.2s;
     }
     .step-card:hover { transform: translateY(-3px); }
     .step-num-wrap {
@@ -811,7 +739,6 @@
       border-radius: 8px;
       display: flex; align-items: center; justify-content: center;
       font-size: 0.75rem;
-      transition: background 0.35s;
     }
     .step-icon.s1 { background: var(--red-light);  color: var(--red); }
     .step-icon.s2 { background: var(--teal-light); color: var(--teal); }
@@ -821,7 +748,6 @@
       font-size: 0.82rem;
       color: var(--ink2);
       line-height: 1.6;
-      transition: color 0.35s;
     }
 
     /* ─── NO RESULTS ─── */
@@ -833,16 +759,16 @@
       border-radius: 18px;
       padding: 48px 24px;
       box-shadow: var(--card-shadow);
-      transition: background 0.35s;
     }
     .no-results i { font-size: 2rem; color: var(--red); opacity: 0.5; margin-bottom: 16px; display: block; }
     .no-results p { color: var(--muted); font-size: 0.95rem; line-height: 1.8; }
     .no-results strong { color: var(--red); }
 
-    /* ─── UTILS ─── */
+    /* ─── UTILITIES ─── */
     @keyframes fadeUp   { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes fadeDown { from { opacity: 0; transform: translateY(-16px); } to { opacity: 1; transform: translateY(0); } }
 
+    /* ─── SCROLLBAR ─── */
     ::-webkit-scrollbar { width: 6px; }
     ::-webkit-scrollbar-track { background: var(--bg); }
     ::-webkit-scrollbar-thumb { background: #c8bfb0; border-radius: 3px; }
@@ -852,16 +778,17 @@
       .hero { grid-template-columns: 1fr; }
       .hero-stats { flex-direction: row; align-items: flex-start; }
       .feat-strip { grid-template-columns: 1fr 1fr; }
+      .topbar-pills { display: none; }
     }
     @media (max-width: 500px) {
       .feat-strip { grid-template-columns: 1fr; }
-      h1 { font-size: 2.6rem; }
-      .topbar-pill { display: none; }
+      h1 { font-size: 2.4rem; }
     }
   </style>
 </head>
 <body>
 
+  <!-- decorative crosses -->
   <div class="deco-cross c1">✚</div>
   <div class="deco-cross c2">✚</div>
   <div class="deco-cross c3">✚</div>
@@ -876,21 +803,10 @@
         <div class="logo-icon"><i class="fa-solid fa-staff-snake"></i></div>
         <span class="logo-text">MediSearch</span>
       </div>
-      <div class="topbar-right">
+      <div class="topbar-pills">
         <span class="topbar-pill active">v2.0</span>
         <span class="topbar-pill"><i class="fa-solid fa-circle" style="color:var(--teal);font-size:7px;vertical-align:middle;margin-left:4px"></i> Live</span>
-
-        <!-- Language Toggle -->
-        <button class="ctrl-btn" id="langToggle" onclick="toggleLang()" title="Switch Language">
-          <i class="fa-solid fa-language"></i>
-          <span id="langLabel">EN</span>
-        </button>
-
-        <!-- Theme Toggle -->
-        <button class="ctrl-btn" id="themeToggle" onclick="toggleTheme()" title="Toggle Theme">
-          <i class="fa-solid fa-moon" id="themeIcon"></i>
-          <span id="themeLabel">Dark</span>
-        </button>
+        <span class="topbar-pill">AI Powered</span>
       </div>
     </nav>
 
@@ -899,19 +815,17 @@
       <div class="hero-left">
         <div class="hero-eyebrow">
           <span class="eyebrow-dot"></span>
-          <span data-i18n="eyebrow">نظام ذكاء اصطناعي طبي</span>
+          نظام ذكاء اصطناعي طبي
         </div>
-        <h1 data-i18n="h1ar" id="mainTitle">
-          اكتشف<br><span class="accent">البديل</span><br>المثالي
-        </h1>
-        <p class="hero-sub" data-i18n="sub">
+        <h1>اكتشف<br><span class="accent">البديل</span><br>المثالي</h1>
+        <p class="hero-sub">
           ابحث عن أي دواء بالعربي أو الإنجليزي — يحلل النظام المادة الفعالة والتركيب الطبي ليقترح أفضل البدائل المتاحة
         </p>
       </div>
       <div class="hero-stats">
         <div class="stat-item red">
           <div class="stat-num">AI</div>
-          <div class="stat-label" data-i18n="stat1">محرك ذكي</div>
+          <div class="stat-label">محرك ذكي</div>
         </div>
         <div class="stat-item teal">
           <div class="stat-num">TF</div>
@@ -919,7 +833,7 @@
         </div>
         <div class="stat-item gold">
           <div class="stat-num">AR/EN</div>
-          <div class="stat-label" data-i18n="stat3">ثنائي اللغة</div>
+          <div class="stat-label">ثنائي اللغة</div>
         </div>
       </div>
     </div>
@@ -929,29 +843,29 @@
       <div class="feat-item">
         <div class="feat-icon-wrap red"><i class="fa-solid fa-language"></i></div>
         <div class="feat-text">
-          <h4 data-i18n="f1t">بحث ثنائي اللغة</h4>
-          <p data-i18n="f1s">عربي وإنجليزي بدون قيود</p>
+          <h4>بحث ثنائي اللغة</h4>
+          <p>عربي وإنجليزي بدون قيود</p>
         </div>
       </div>
       <div class="feat-item">
         <div class="feat-icon-wrap teal"><i class="fa-solid fa-spell-check"></i></div>
         <div class="feat-text">
-          <h4 data-i18n="f2t">تصحيح تلقائي</h4>
-          <p data-i18n="f2s">يصلح الأخطاء الإملائية فورًا</p>
+          <h4>تصحيح تلقائي</h4>
+          <p>يصلح الأخطاء الإملائية فورًا</p>
         </div>
       </div>
       <div class="feat-item">
         <div class="feat-icon-wrap gold"><i class="fa-solid fa-brain"></i></div>
         <div class="feat-text">
-          <h4 data-i18n="f3t">محرك ML</h4>
+          <h4>محرك ML</h4>
           <p>Cosine Similarity & TF-IDF</p>
         </div>
       </div>
       <div class="feat-item">
         <div class="feat-icon-wrap blue"><i class="fa-solid fa-pills"></i></div>
         <div class="feat-text">
-          <h4 data-i18n="f4t">بدائل ذكية</h4>
-          <p data-i18n="f4s">مبنية على المادة الفعالة</p>
+          <h4>بدائل ذكية</h4>
+          <p>مبنية على المادة الفعالة</p>
         </div>
       </div>
     </div>
@@ -959,8 +873,8 @@
     <!-- SEARCH -->
     <div class="search-section">
       <div class="search-section-header">
-        <h2 data-i18n="searchH">ابحث الآن</h2>
-        <span data-i18n="searchSub">// اكتب واتركه يعمل</span>
+        <h2>ابحث الآن</h2>
+        <span>// اكتب واتركه يعمل</span>
       </div>
 
       <div class="search-box">
@@ -968,19 +882,18 @@
         <input
           id="drugInput"
           type="text"
+          placeholder="اكتب اسم الدواء... مثال: Panadol أو بانادول"
           autocomplete="off"
           spellcheck="false"
         />
-        <div class="typing-badge" id="typingBadge">
-          <div class="typing-dot"></div>
-          <div class="typing-dot"></div>
-          <div class="typing-dot"></div>
-          <span id="typingText">جاري البحث</span>
-        </div>
+        <button id="searchBtn" onclick="searchDrug()">
+          <span>بحث</span>
+          <i class="fa-solid fa-arrow-left btn-icon"></i>
+        </button>
       </div>
 
       <div class="quick-tags">
-        <span class="quick-label" data-i18n="examples">أمثلة:</span>
+        <span class="quick-label">أمثلة:</span>
         <span class="q-tag" onclick="fillAndSearch('Panadol')"><i class="fa-solid fa-capsules"></i> Panadol</span>
         <span class="q-tag" onclick="fillAndSearch('Ibuprofen')"><i class="fa-solid fa-capsules"></i> Ibuprofen</span>
         <span class="q-tag" onclick="fillAndSearch('بانادول')"><i class="fa-solid fa-capsules"></i> بانادول</span>
@@ -994,8 +907,8 @@
       <div class="loading-track">
         <div class="pulse-ring"></div>
         <div class="loading-info">
-          <div class="loading-title" data-i18n="loadT">جاري تحليل قاعدة البيانات الطبية</div>
-          <div class="loading-sub" data-i18n="loadS">يبحث عن أفضل البدائل</div>
+          <div class="loading-title">جاري تحليل قاعدة البيانات الطبية</div>
+          <div class="loading-sub">يبحث عن أفضل البدائل</div>
         </div>
         <div class="loading-bar-wrap">
           <div class="loading-bar"><div class="loading-bar-fill"></div></div>
@@ -1011,7 +924,7 @@
 
     <!-- RESULTS HEADER -->
     <div class="results-header" id="resultsHeader">
-      <div class="results-title"><span data-i18n="resFor">نتائج البحث عن</span> <span id="resultsQuery"></span></div>
+      <div class="results-title">نتائج البحث عن <span id="resultsQuery"></span></div>
       <span class="results-count" id="resultsCount"></span>
     </div>
 
@@ -1021,24 +934,36 @@
     <!-- EMPTY STATE -->
     <div id="emptyState">
       <div class="empty-icon-wrap"><i class="fa-solid fa-microscope"></i></div>
-      <h3 data-i18n="emptyH">كيف يعمل النظام؟</h3>
-      <p data-i18n="emptyP">اكتب اسم أي دواء وسيقوم الذكاء الاصطناعي بتحليل المادة الفعالة والاستخدام الطبي لاقتراح أفضل البدائل المتاحة</p>
+      <h3>كيف يعمل النظام؟</h3>
+      <p>اكتب اسم أي دواء وسيقوم الذكاء الاصطناعي بتحليل المادة الفعالة والاستخدام الطبي لاقتراح أفضل البدائل المتاحة</p>
       <div class="steps-grid">
         <div class="step-card">
-          <div class="step-num-wrap"><span class="step-num">01</span><span class="step-icon s1"><i class="fa-solid fa-keyboard"></i></span></div>
-          <p data-i18n="step1">اكتب اسم الدواء بأي لغة</p>
+          <div class="step-num-wrap">
+            <span class="step-num">01</span>
+            <span class="step-icon s1"><i class="fa-solid fa-keyboard"></i></span>
+          </div>
+          <p>اكتب اسم الدواء بأي لغة</p>
         </div>
         <div class="step-card">
-          <div class="step-num-wrap"><span class="step-num">02</span><span class="step-icon s2"><i class="fa-solid fa-flask"></i></span></div>
-          <p data-i18n="step2">يحلل المادة الفعالة والتركيب</p>
+          <div class="step-num-wrap">
+            <span class="step-num">02</span>
+            <span class="step-icon s2"><i class="fa-solid fa-flask"></i></span>
+          </div>
+          <p>يحلل المادة الفعالة والتركيب</p>
         </div>
         <div class="step-card">
-          <div class="step-num-wrap"><span class="step-num">03</span><span class="step-icon s3"><i class="fa-solid fa-chart-bar"></i></span></div>
-          <p data-i18n="step3">يحسب درجة التشابه بدقة عالية</p>
+          <div class="step-num-wrap">
+            <span class="step-num">03</span>
+            <span class="step-icon s3"><i class="fa-solid fa-chart-bar"></i></span>
+          </div>
+          <p>يحسب درجة التشابه بدقة عالية</p>
         </div>
         <div class="step-card">
-          <div class="step-num-wrap"><span class="step-num">04</span><span class="step-icon s4"><i class="fa-solid fa-list-check"></i></span></div>
-          <p data-i18n="step4">يعرض البدائل مرتبة تنازليًا</p>
+          <div class="step-num-wrap">
+            <span class="step-num">04</span>
+            <span class="step-icon s4"><i class="fa-solid fa-list-check"></i></span>
+          </div>
+          <p>يعرض البدائل مرتبة تنازليًا</p>
         </div>
       </div>
     </div>
@@ -1046,193 +971,39 @@
   </div>
 
   <script>
-    /* ════════════════════════════════════════════
-       TRANSLATIONS
-    ════════════════════════════════════════════ */
-    const i18n = {
-      ar: {
-        eyebrow:  "نظام ذكاء اصطناعي طبي",
-        h1:       `اكتشف<br><span class="accent">البديل</span><br>المثالي`,
-        sub:      "ابحث عن أي دواء بالعربي أو الإنجليزي — يحلل النظام المادة الفعالة والتركيب الطبي ليقترح أفضل البدائل المتاحة",
-        stat1:    "محرك ذكي",
-        stat3:    "ثنائي اللغة",
-        f1t: "بحث ثنائي اللغة", f1s: "عربي وإنجليزي بدون قيود",
-        f2t: "تصحيح تلقائي",   f2s: "يصلح الأخطاء الإملائية فورًا",
-        f3t: "محرك ML",         f4t: "بدائل ذكية",
-        f4s: "مبنية على المادة الفعالة",
-        searchH:  "ابحث الآن",
-        searchSub:"// اكتب واتركه يعمل",
-        placeholder: "اكتب اسم الدواء... مثال: Panadol أو بانادول",
-        examples: "أمثلة:",
-        typingText:"جاري البحث",
-        loadT:    "جاري تحليل قاعدة البيانات الطبية",
-        loadS:    "يبحث عن أفضل البدائل",
-        resFor:   "نتائج البحث عن",
-        results:  "نتيجة",
-        emptyH:   "كيف يعمل النظام؟",
-        emptyP:   "اكتب اسم أي دواء وسيقوم الذكاء الاصطناعي بتحليل المادة الفعالة والاستخدام الطبي لاقتراح أفضل البدائل المتاحة",
-        step1: "اكتب اسم الدواء بأي لغة",
-        step2: "يحلل المادة الفعالة والتركيب",
-        step3: "يحسب درجة التشابه بدقة عالية",
-        step4: "يعرض البدائل مرتبة تنازليًا",
-        noRes: "لم يتم العثور على نتائج لـ",
-        noResSub: "جرب كتابة اسم مختلف أو تأكد من الإملاء",
-        errTimeout: "انتهت مهلة الاتصال — الخادم لم يستجب في الوقت المحدد",
-        errOffline: "لا يوجد اتصال بالإنترنت — تحقق من شبكتك",
-        errGeneral: "تعذّر الاتصال بقاعدة البيانات الطبية — يرجى المحاولة لاحقًا",
-        langLabel: "EN", themeLabel: "Dark",
-        activeSubstance: "المادة الفعالة",
-        dosageForm: "شكل الجرعة",
-        medicalUse: "الاستخدام الطبي"
-      },
-      en: {
-        eyebrow:  "AI Medical Intelligence System",
-        h1:       `Find the<br><span class="accent">Perfect</span><br>Alternative`,
-        sub:      "Search for any drug in Arabic or English — the system analyses the active substance and medical composition to suggest the best available alternatives.",
-        stat1:    "Smart Engine",
-        stat3:    "Bilingual",
-        f1t: "Bilingual Search",   f1s: "Arabic & English, no limits",
-        f2t: "Auto Correction",    f2s: "Fixes spelling errors instantly",
-        f3t: "ML Engine",          f4t: "Smart Alternatives",
-        f4s: "Based on active substance",
-        searchH:  "Search Now",
-        searchSub:"// Type and let it work",
-        placeholder: "Type a drug name... e.g. Panadol or Amoxicillin",
-        examples: "Examples:",
-        typingText:"Searching",
-        loadT:    "Analysing medical database",
-        loadS:    "Finding the best alternatives",
-        resFor:   "Results for",
-        results:  "results",
-        emptyH:   "How does it work?",
-        emptyP:   "Type any drug name and the AI will analyse the active substance and medical use to suggest the best available alternatives.",
-        step1: "Type any drug name in any language",
-        step2: "Analyses the active substance & composition",
-        step3: "Calculates similarity score precisely",
-        step4: "Displays alternatives ranked highest first",
-        noRes: "No results found for",
-        noResSub: "Try a different spelling or drug name",
-        errTimeout: "Connection timed out — server did not respond in time",
-        errOffline: "No internet connection — check your network",
-        errGeneral: "Could not reach the medical database — please try again later",
-        langLabel: "ع", themeLabel: "Light",
-        activeSubstance: "Active Substance",
-        dosageForm: "Dosage Form",
-        medicalUse: "Medical Use"
-      }
-    };
-
-    let currentLang = "ar";
-    let currentTheme = "light";
-
-    /* ═══ LANGUAGE ═══ */
-    function toggleLang() {
-      currentLang = currentLang === "ar" ? "en" : "ar";
-      const isEn = currentLang === "en";
-      const html = document.documentElement;
-
-      html.setAttribute("lang", currentLang);
-      html.setAttribute("dir", isEn ? "ltr" : "rtl");
-      html.setAttribute("data-lang", currentLang);
-
-      applyTranslations();
-    }
-
-    function applyTranslations() {
-      const t = i18n[currentLang];
-
-      // i18n keys mapping
-      const map = {
-        eyebrow: t.eyebrow, h1ar: t.h1, sub: t.sub,
-        stat1: t.stat1, stat3: t.stat3,
-        f1t: t.f1t, f1s: t.f1s, f2t: t.f2t, f2s: t.f2s,
-        f3t: t.f3t, f4t: t.f4t, f4s: t.f4s,
-        searchH: t.searchH, searchSub: t.searchSub,
-        examples: t.examples,
-        loadT: t.loadT, loadS: t.loadS, resFor: t.resFor,
-        emptyH: t.emptyH, emptyP: t.emptyP,
-        step1: t.step1, step2: t.step2, step3: t.step3, step4: t.step4,
-      };
-
-      Object.entries(map).forEach(([key, val]) => {
-        document.querySelectorAll(`[data-i18n="${key}"]`).forEach(el => {
-          el.innerHTML = val;
-        });
-      });
-
-      // Special: h1 needs innerHTML
-      document.getElementById("mainTitle").innerHTML = t.h1;
-
-      // Placeholder
-      document.getElementById("drugInput").placeholder = t.placeholder;
-
-      // Typing badge
-      document.getElementById("typingText").textContent = t.typingText;
-
-      // Controls
-      document.getElementById("langLabel").textContent = t.langLabel;
-      document.getElementById("themeLabel").textContent = t.themeLabel;
-    }
-
-    /* ═══ THEME ═══ */
-    function toggleTheme() {
-      currentTheme = currentTheme === "light" ? "dark" : "light";
-      document.documentElement.setAttribute("data-theme", currentTheme);
-      const isDark = currentTheme === "dark";
-      document.getElementById("themeIcon").className = isDark ? "fa-solid fa-sun" : "fa-solid fa-moon";
-      // Also update label for opposite lang
-      document.getElementById("themeLabel").textContent = isDark
-        ? (currentLang === "ar" ? "فاتح" : "Light")
-        : (currentLang === "ar" ? "داكن" : "Dark");
-    }
-
-    /* ════════════════════════════════════════════
-       SEARCH — instant on typing (300ms debounce)
-    ════════════════════════════════════════════ */
-    
-    // const API_BASE = "http://38.211.244.61:8000";
-    const API_BASE = " https://admissibly-untough-ariyah.ngrok-free.dev";
-    
+    const API_BASE = "http://38.211.244.61:8000";
     let searchTimer = null;
-    let lastQuery = "";
 
     const input = document.getElementById("drugInput");
     const resultsHeader = document.getElementById("resultsHeader");
     const resultsQueryEl = document.getElementById("resultsQuery");
     const resultsCountEl = document.getElementById("resultsCount");
-    const typingBadge = document.getElementById("typingBadge");
 
+    // ── Search on input (1s debounce) ──
     input.addEventListener("input", () => {
       clearTimeout(searchTimer);
       const val = input.value.trim();
-      if (!val) {
-        typingBadge.classList.remove("show");
-        return;
-      }
-      typingBadge.classList.add("show");
-      searchTimer = setTimeout(() => {
-        typingBadge.classList.remove("show");
-        searchDrug();
-      }, 300);
+      if (!val) return;
+      searchTimer = setTimeout(() => searchDrug(), 1000);
     });
 
+    // Keep Enter as instant trigger
     input.addEventListener("keydown", e => {
       if (e.key === "Enter") {
         clearTimeout(searchTimer);
-        typingBadge.classList.remove("show");
         searchDrug();
       }
     });
 
     function fillAndSearch(name) {
       clearTimeout(searchTimer);
-      typingBadge.classList.remove("show");
       input.value = name;
       searchDrug();
     }
 
     function setLoading(on) {
       document.getElementById("loading").style.display = on ? "block" : "none";
+      document.getElementById("searchBtn").disabled = on;
     }
 
     function showError(msg) {
@@ -1248,6 +1019,7 @@
     }
 
     function scoreToPercent(score) {
+      // score might be 0-1 float or 0-100
       const n = parseFloat(score);
       if (isNaN(n)) return 50;
       return n <= 1 ? Math.round(n * 100) : Math.round(n);
@@ -1255,10 +1027,8 @@
 
     async function searchDrug() {
       const query = input.value.trim();
-      if (!query || query === lastQuery) return;
-      lastQuery = query;
+      if (!query) return;
 
-      const t = i18n[currentLang];
       const resultsDiv = document.getElementById("results");
       const emptyState = document.getElementById("emptyState");
 
@@ -1276,8 +1046,10 @@
           `${API_BASE}/recommend/${encodeURIComponent(query)}`,
           { signal: controller.signal }
         );
+
         clearTimeout(timeout);
-        if (!response.ok) throw new Error(`Server ${response.status}`);
+
+        if (!response.ok) throw new Error(`Server responded with ${response.status}`);
 
         const data = await response.json();
         setLoading(false);
@@ -1286,21 +1058,25 @@
           resultsDiv.innerHTML = `
             <div class="no-results">
               <i class="fa-solid fa-circle-xmark"></i>
-              <p>${t.noRes} <strong>"${escapeHtml(query)}"</strong><br>${t.noResSub}</p>
-            </div>`;
+              <p>لم يتم العثور على نتائج لـ <strong>"${escapeHtml(query)}"</strong><br>
+              جرب كتابة اسم مختلف أو تأكد من الإملاء</p>
+            </div>
+          `;
           return;
         }
 
+        // Show header
         resultsQueryEl.textContent = `"${query}"`;
-        resultsCountEl.textContent = `${data.recommendations.length} ${t.results}`;
+        resultsCountEl.textContent = `${data.recommendations.length} نتيجة`;
         resultsHeader.classList.add("show");
 
-        const r = 20;
-        const C = 2 * Math.PI * r;
+        const r = 20; // radius
+        const C = 2 * Math.PI * r; // circumference ≈ 125.66
 
         data.recommendations.forEach((drug, i) => {
-          const pct  = scoreToPercent(drug.similarity_score);
+          const pct = scoreToPercent(drug.similarity_score);
           const dash = (pct / 100) * C;
+
           const card = document.createElement("div");
           card.className = "drug-card";
           card.style.animationDelay = `${i * 0.07}s`;
@@ -1314,7 +1090,8 @@
                 <svg viewBox="0 0 48 48" width="48" height="48">
                   <circle class="ring-bg"   cx="24" cy="24" r="${r}"/>
                   <circle class="ring-fill" cx="24" cy="24" r="${r}"
-                    stroke-dasharray="${dash.toFixed(1)} ${C.toFixed(1)}"/>
+                    stroke-dasharray="${dash.toFixed(1)} ${C.toFixed(1)}"
+                  />
                 </svg>
                 <div class="score-text">${pct}%</div>
               </div>
@@ -1324,46 +1101,47 @@
               <div class="field">
                 <div class="field-icon s"><i class="fa-solid fa-atom"></i></div>
                 <div class="field-body">
-                  <div class="field-label">${t.activeSubstance}</div>
+                  <div class="field-label">Active Substance</div>
                   <div class="field-value">${escapeHtml(drug.active_substance || '—')}</div>
                 </div>
               </div>
               <div class="field">
                 <div class="field-icon d"><i class="fa-solid fa-tablets"></i></div>
                 <div class="field-body">
-                  <div class="field-label">${t.dosageForm}</div>
+                  <div class="field-label">Dosage Form</div>
                   <span class="field-pill">${escapeHtml(drug.dosage_form || '—')}</span>
                 </div>
               </div>
               <div class="field">
                 <div class="field-icon u"><i class="fa-solid fa-stethoscope"></i></div>
                 <div class="field-body">
-                  <div class="field-label">${t.medicalUse}</div>
+                  <div class="field-label">Medical Use</div>
                   <div class="field-value">${escapeHtml(drug.indication || '—')}</div>
                 </div>
               </div>
-            </div>`;
+            </div>
+          `;
           resultsDiv.appendChild(card);
         });
 
       } catch (err) {
         setLoading(false);
-        const t = i18n[currentLang];
-        if (err.name === "AbortError") showError(t.errTimeout);
-        else if (!navigator.onLine)   showError(t.errOffline);
-        else                          showError(t.errGeneral);
+        if (err.name === "AbortError") {
+          showError("انتهت مهلة الاتصال — الخادم لم يستجب في الوقت المحدد");
+        } else if (!navigator.onLine) {
+          showError("لا يوجد اتصال بالإنترنت — تحقق من شبكتك");
+        } else {
+          showError("تعذّر الاتصال بقاعدة البيانات الطبية — يرجى المحاولة لاحقًا");
+        }
         console.error("[MediSearch]", err);
       }
     }
 
     function escapeHtml(str) {
       return String(str)
-        .replace(/&/g,"&amp;").replace(/</g,"&lt;")
-        .replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+        .replace(/&/g, "&amp;").replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
     }
-
-    /* ── Init ── */
-    applyTranslations();
   </script>
 </body>
 </html>
